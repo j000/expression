@@ -182,27 +182,27 @@ $(filter-out %.c.o %.cpp.o,$(OBJ)): $(OBJDIR)/%.o: $(SRCDIR)/%
 	echo "$$INCBIN" | sed -e 's/@sym@/$(subst .,_,$*)/' -e 's/@file@/$</' | gcc -x assembler-with-cpp - -c -o $@
 
 # compile
-$(OBJDIR)/%.c.o: $(DEPDIR)/%.c.d
+$(OBJDIR)/%.c.o: | $(DEPDIR)/%.c.d
 	@printf "$(COLOR)Compile $(SRCDIR)/$*.c -> $@$(RESET)\\n"
 	$(CC) $(CFLAGS) -c -o $@ $(SRCDIR)/$*.c
 
 # compile
-$(OBJDIR)/%.cpp.o: $(DEPDIR)/%.cpp.d
+$(OBJDIR)/%.cpp.o: | $(DEPDIR)/%.cpp.d
 	@printf "$(COLOR)Compile $(SRCDIR)/$*.cpp -> $@$(RESET)\\n"
 	$(CXX) $(CXXFLAGS) -c -o $@ $(SRCDIR)/$*.cpp
 
 # build dependecies list
 $(DEPDIR)/%.c.d: $(SRCDIR)/%.c
 	@printf "$(COLOR)Generating dependencies $(SRCDIR)/$*.c -> $@$(RESET)\\n"
-	$(CC) $(CFLAGS) $(DEPFLAGS) -MM -MT '$$(OBJDIR)/$*.c.o' $< | sed 's,^\([^:]\+.o\):,\1 $$(DEPDIR)/$*.c.d:,' > $@
+	$(CC) $(CFLAGS) $(DEPFLAGS) -MM -MT '$$(OBJDIR)/$*.c.o' $< -o $@
 
 # build dependecies list
 $(DEPDIR)/%.cpp.d: $(SRCDIR)/%.cpp
 	@printf "$(COLOR)Generating dependencies $(SRCDIR)/$*.cpp -> $@$(RESET)\\n"
-	$(CXX) $(CXXFLAGS) $(DEPFLAGS) -MM -MT '$$(OBJDIR)/$*.cpp.o' $< | sed 's,^\([^:]\+.o\):,\1 $$(DEPDIR)/$*.cpp.d:,' > $@
+	$(CXX) $(CXXFLAGS) $(DEPFLAGS) -MM -MT '$$(OBJDIR)/$*.cpp.o' -o $@
 
 # include generated dependencies
--include $(wildcard $(DEP))
+include $(DEP)
 
 # depend on directory
 $(OBJ): | $(OBJDIR)
