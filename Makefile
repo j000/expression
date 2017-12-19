@@ -1,4 +1,4 @@
-SRC ?= main.c
+SRC ?= main.c stack.c
 
 SRCDIR ?= .
 OBJDIR ?= .objdir
