@@ -15,7 +15,9 @@ typedef struct _stack {
 
 stack_t stack_new(size_t element_size) {
 	assert(element_size > 0);
+
 	stack_t s = calloc(1, sizeof(*s));
+
 	assert(s != NULL);
 	s->element_size = element_size;
 	s->size = 0;
@@ -36,6 +38,7 @@ bool stack_is_empty(stack_t s) {
 
 void stack_push(stack_t s, const void *element_address) {
 	void *dest;
+
 	if (s->size == s->capacity) {
 		s->capacity *= 2;
 		s->elements = realloc(s->elements, s->capacity * s->element_size);
@@ -54,5 +57,4 @@ void stack_pop(stack_t s, void *element_address) {
 	s->size -= 1;
 	source = (const char *)s->elements + s->size * s->element_size;
 	memcpy(element_address, source, s->element_size);
-
 }

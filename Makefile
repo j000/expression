@@ -1,4 +1,4 @@
-SRC ?= main.c stack.c
+SRC ?= main.c stack.c stack.h
 
 SRCDIR ?= .
 OBJDIR ?= .objdir
@@ -114,7 +114,7 @@ LDFLAGS += $(shell pkg-config --libs-only-L icu-uc icu-io)
 
 EXE := $(basename $(firstword $(SRC)))
 
-OBJ := $(foreach src,$(SRC),$(OBJDIR)/$(src).o)
+OBJ := $(foreach src,$(filter %.c %.cpp,$(SRC)),$(OBJDIR)/$(src).o)
 
 DEP := $(foreach src,$(SRC),$(DEPDIR)/$(src).d)
 
