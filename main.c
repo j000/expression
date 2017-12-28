@@ -5,8 +5,14 @@
 #include "stack.h"
 
 int main(int argc, char **argv) {
-	stack_t stack = stack_create(20, STACK_DOUBLE);
+	printf("char: %zu\n", sizeof(char));
+	printf("int: %zu\n", sizeof(int));
+	printf("long: %zu\n", sizeof(long));
+	printf("double: %zu\n", sizeof(double));
+	printf("void *: %zu\n", sizeof(void *));
+	stack_t stack = stack_create(STACK_DOUBLE);
 	stack_push(stack, (double)1);
+	stack_push(stack, (unsigned long)0);
 	stack_push(stack, 2.);
 	stack_push(stack, 3);
 	while (!stack_is_empty(stack)) {
