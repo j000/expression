@@ -1,118 +1,51 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <stdarg.h>
-
 #include "stack.h"
 
-union stack_element {
-	int val_i;
-	long val_l;
-	double val_d;
-	void *val_p;
-};
+#include <stdlib.h>
+#include <string.h>
+#include <assert.h>
 
-struct stack {
-	size_t top;
-	size_t capacity;
-	enum stack_type type;
-	union stack_element *elements;
-};
+#define INITIAL_CAPACITY 8
 
-stack_t stack_create(const enum stack_type type) {
-	stack_t new_stack = calloc(1, sizeof(*new_stack));
-
-	if (new_stack == NULL) {
-		perror("Couldn't allocate memory for stack");
-		exit(EXIT_FAILURE);
-	}
-
-	new_stack->capacity = 8;
-	new_stack->top = 0;
-	new_stack->type = type;
-
-	new_stack->elements = calloc(new_stack->capacity, sizeof(*new_stack->elements));
-	if (new_stack->elements == NULL) {
-		perror("Couldn't allocate memory for stack elements");
-		exit(EXIT_FAILURE);
-	}
-
-	return new_stack;
+stack_t stack_new(size_t element_size) {
+	assert(element_size > 0);
+	stack_t s = calloc(1, sizeof(*s));
+	assert(s != NULL);
+	s->element_size = element_size;
+	s->size = 0;
+	s->capacity = INITIAL_CAPACITY;
+	s->elements = calloc(s->capacity, s->element_size);
+	assert(s->elements != NULL);
+	return s;
 }
 
-void stack_destroy(stack_t stack) {
-	free(stack->elements);
-	free(stack);
+void stack_free(stack_t s) {
+	free(s->elements);
+	free(s);
 }
 
-void stack_push(stack_t stack, ...) {
-	if (stack->top == stack->capacity) {
-		stack->capacity *= 2;
-		void *tmp = realloc(stack->elements, stack->capacity);
-		if (tmp == NULL) {
-			perror("Couldn't reallocate memory for stack elements");
-			exit(EXIT_FAILURE);
-		}
-		stack->elements = tmp;
-	}
-
-	va_list ap;
-
-	va_start(ap, stack);
-
-	switch (stack->type) {
-	case STACK_INT:
-		stack->elements[stack->top++].val_i = va_arg(ap, int);
-		break;
-
-	case STACK_LONG:
-		stack->elements[stack->top++].val_l = va_arg(ap, long);
-		break;
-
-	case STACK_DOUBLE:
-		stack->elements[stack->top++].val_d = va_arg(ap, double);
-		break;
-
-	case STACK_POINTER:
-		stack->elements[stack->top++].val_p = va_arg(ap, void *);
-		break;
-
-	default:
-		fprintf(stderr, "Unknown type in stack_push()\n");
-		exit(EXIT_FAILURE);
-	}
-
-	va_end(ap);
+bool stack_is_empty(stack_t s) {
+	return s->size == 0;
 }
 
-void stack_pop(stack_t stack, void *p) {
-	if (stack->top == 0) {
-		fprintf(stderr, "Stack empty!\n");
-		exit(EXIT_FAILURE);
+void stack_push(stack_t s, const void *element_address) {
+	void *dest;
+	if (s->size == s->capacity) {
+		s->capacity *= 2;
+		s->elements = realloc(s->elements, s->capacity * s->element_size);
+		assert(s->elements != NULL);
 	}
 
-	switch (stack->type) {
-	case STACK_INT:
-		*((int *)p) = stack->elements[--stack->top].val_i;
-		break;
-
-	case STACK_LONG:
-		*((long *)p) = stack->elements[--stack->top].val_l;
-		break;
-
-	case STACK_DOUBLE:
-		*((double *)p) = stack->elements[--stack->top].val_d;
-		break;
-
-	case STACK_POINTER:
-		*((void **)p) = stack->elements[--stack->top].val_p;
-		break;
-
-	default:
-		fprintf(stderr, "Unknown type in stack_pop()\n");
-		exit(EXIT_FAILURE);
-	}
+	dest = (char *)s->elements + s->size * s->element_size;
+	memcpy(dest, element_address, s->element_size);
+	s->size += 1;
 }
 
-bool stack_is_empty(stack_t stack) {
-	return stack->top == 0;
+void stack_pop(stack_t s, void *element_address) {
+	const void *source;
+
+	assert(!stack_is_empty(s));
+	s->size -= 1;
+	source = (const char *)s->elements + s->size * s->element_size;
+	memcpy(element_address, source, s->element_size);
+
 }
