@@ -9,3 +9,4 @@ void stack_free(stack_t s);
 bool stack_is_empty(stack_t s);
 void stack_push(stack_t s, const void *element_address);
 void stack_pop(stack_t s, void *element_address);
+void stack_peek(stack_t s, void *element_address);

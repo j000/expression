@@ -51,10 +51,14 @@ void stack_push(stack_t s, const void *element_address) {
 }
 
 void stack_pop(stack_t s, void *element_address) {
+	stack_peek(s, element_address);
+	s->size -= 1;
+}
+
+void stack_peek(stack_t s, void *element_address) {
 	const void *source;
 
 	assert(!stack_is_empty(s));
-	s->size -= 1;
-	source = (const char *)s->elements + s->size * s->element_size;
+	source = (const char *)s->elements + (s->size - 1) * s->element_size;
 	memcpy(element_address, source, s->element_size);
 }
