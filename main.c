@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <assert.h>
 
 #include "bool.h"
 #include "stack.h"
@@ -14,11 +15,20 @@ int main(int argc, char **argv) {
 	stack_push(stack, &a);
 	stack_push(stack, &(double){2. });
 	stack_push(stack, &(double){3 });
-	while (!stack_is_empty(stack)) {
-		double tmp;
+	double t = 0;
+	assert(!stack_is_empty(stack));
+	stack_pop(stack, &t);
+	assert(t == 3.);
+	assert(!stack_is_empty(stack));
+	stack_pop(stack, &t);
+	assert(t == 2.);
+	assert(!stack_is_empty(stack));
+	stack_pop(stack, &t);
+	assert(t == 1.);
+	assert(!stack_is_empty(stack));
+	stack_pop(stack, &t);
+	assert(t == 0.);
+	assert(stack_is_empty(stack));
 
-		stack_pop(stack, &tmp);
-		printf("%.3f\n", tmp);
-	}
 	return EXIT_SUCCESS;
 }
