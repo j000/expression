@@ -2,12 +2,7 @@
 #include <stddef.h>
 #include "bool.h"
 
-typedef struct {
-	void *elements;
-	size_t element_size;
-	size_t size;
-	size_t capacity;
-} *stack_t;
+typedef struct _stack *stack_t;
 
 stack_t stack_new(size_t element_size);
 void stack_free(stack_t s);

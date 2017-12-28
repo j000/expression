@@ -6,6 +6,13 @@
 
 #define INITIAL_CAPACITY 8
 
+typedef struct _stack {
+	void *elements;
+	size_t element_size;
+	size_t size;
+	size_t capacity;
+} *stack_t;
+
 stack_t stack_new(size_t element_size) {
 	assert(element_size > 0);
 	stack_t s = calloc(1, sizeof(*s));
